@@ -5,6 +5,8 @@
 
 #include <list>
 
+#include "pathfinding.hpp"
+
 struct estado {
   int fila;
   int columna;
