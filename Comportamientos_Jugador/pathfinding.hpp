@@ -8,9 +8,7 @@
 #include <queue>
 #include <string>
 #include <list>
-//#include <optional>
-
-#include "status_value/include/nonstd/status_value.hpp"
+#include <optional>
 
 #include <fstream>
 #include <iostream>
@@ -54,10 +52,9 @@ struct int_infty {
 };
 
 struct comp {
-  Index goal;
   std::reference_wrapper<std::map<Index, int_infty, index_comp>> f_score;
   
-  comp(Index g, std::map<Index, int_infty, index_comp>& f_score) : goal(g), f_score(f_score) {}
+  comp(Index g, std::map<Index, int_infty, index_comp>& f_score) : f_score(f_score) {}
   
   int operator()(const Index& a, const Index& b);
 };
@@ -67,10 +64,8 @@ std::vector<Index> neighbors(Index i, Map<T> m);
 
 Path reconstruct_path(Index goal, std::map<Index, Index, index_comp> came_from);
 
-struct unit_t {};
-
 template<class Heuristic>
-nonstd::status_value<unit_t,Path> pathfinding(Map<Tile> map, Index start, Index goal, Heuristic h);
+std::optional<Path> pathfinding(Map<Tile> map, Index start, Index goal, Heuristic h);
 
 
 #endif // __PATHFINDING_HPP__

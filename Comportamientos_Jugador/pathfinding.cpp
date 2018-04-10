@@ -100,7 +100,7 @@ Path reconstruct_path(Index goal, std::map<Index, Index, index_comp> came_from)
 }
 
 template<class Heuristic>
-nonstd::status_value<unit_t,Path> pathfinding(Map<Tile> map, Index start, Index goal, Heuristic h)
+std::optional<Path> pathfinding(Map<Tile> map, Index start, Index goal, Heuristic h)
 {
   std::set<Index> closed_set;
   
@@ -128,7 +128,7 @@ nonstd::status_value<unit_t,Path> pathfinding(Map<Tile> map, Index start, Index 
     auto current = open_set.top();
 
     if(current == goal)
-      return nonstd::status_value<unit_t,Path>(unit_t(), reconstruct_path(goal, came_from));
+      return std::optional<Path>(reconstruct_path(goal, came_from));
 
     open_set.pop();
     open_set_.erase(current);
@@ -163,5 +163,5 @@ nonstd::status_value<unit_t,Path> pathfinding(Map<Tile> map, Index start, Index 
     
   }
 
-  return nonstd::status_value<unit_t,Path>(unit_t());
+  return std::nullopt;
 }
