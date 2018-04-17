@@ -32,7 +32,7 @@ std::vector<std::vector<Tile>> read_map(const std::string& file_name)
  */
 Index::Index(int x, int y) : pos{x,y} { }
 
-Index::coord(Coord c) const
+int Index::coord(Coord c) const
 {
   switch(c)
   {
@@ -53,15 +53,14 @@ Map::Map(std::vector<std::vector<Tile>> map) : map(map) { }
 
 std::optional<Tile> Map::at(Index pos) const
 {
-  using Coord;
-  bool positive_coordinates = pos.coord(X) >= 0 && pos.coord(Y) >= 0;
-  bool bounded_x_coordinate = pos.coord(X) < map.size();
-  bool bounded_coordinates = bounded_x_coordinate && pos.coord(Y) < m[pos.coord(X)].size();
+  bool positive_coordinates = pos.coord(Coord::X) >= 0 && pos.coord(Coord::Y) >= 0;
+  bool bounded_x_coordinate = pos.coord(Coord::X) < map.size();
+  bool bounded_coordinates = bounded_x_coordinate && pos.coord(Coord::Y) < map[pos.coord(Coord::X)].size();
 
   if(!(positive_coordinates && bounded_coordinates))
     return {};
 
-  return map[pos.coord(X)][pos.coord(Y)];
+  return map[pos.coord(Coord::X)][pos.coord(Coord::Y)];
 }
 
 /*
@@ -92,8 +91,8 @@ State operator+(State s, MoveAction a)
 
   if(a == MoveAction::Forward)
     pos = Index {
-      pos.coord(Coord::X)+(static_cast<uint32_t>(s.get_compass())-1)%2,
-      pos.coord(Coord::Y)+(static_cast<uint32_t>(s.get_compass())-2)%2
+      pos.coord(Coord::X)+(static_cast<int32_t>(s.get_compass())-1)%2,
+      pos.coord(Coord::Y)+(static_cast<int32_t>(s.get_compass())-2)%2
     };
 
 
@@ -107,18 +106,19 @@ State operator+(State s, MoveAction a)
 
 
 bool index_comp::operator()(const Index& a, const Index& b) const
-  {
-    if(a.first < b.first) return true;
-    if(a.first > b.first) return false;
+{
+    if(a.coord(Coord::X) < b.coord(Coord::X)) return true;
+    if(a.coord(Coord::X) > b.coord(Coord::X)) return false;
 
-    if(a.second < b.second) return true;
+    if(a.coord(Coord::Y) < b.coord(Coord::Y)) return true;
 
     return false;
-  }
+}
 
 int manhattan_distance(Index x, Index y)
 {
-  return std::abs(x.first-y.first) + std::abs(x.second-y.second);
+  return std::abs(x.coord(Coord::X)-y.coord(Coord::X)) +
+         std::abs(x.coord(Coord::Y)-y.coord(Coord::Y));
 }
 
 int_infty::operator int&() { return i; }

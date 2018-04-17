@@ -59,6 +59,7 @@ class Index {
 public:
   Index(int x, int y);
   int coord(Coord c) const;
+  bool operator==(const Index& other) const;
 };
 
 
@@ -85,9 +86,9 @@ public:
 
 State operator+(State s, MoveAction a);
 
-template<class T>
-using Map = std::vector<std::vector<T>>;
-using Index = std::pair<int, int>;
+// template<class T>
+// using Map = std::vector<std::vector<T>>;
+// using Index = std::pair<int, int>;
 using Path = std::list<Index>;
 
 // Compare indices.
@@ -112,39 +113,16 @@ struct comp {
   int operator()(const Index& a, const Index& b);
 };
 
-template<class T>
-std::vector<Index> neighbors(Index i, Map<T> m)
+std::vector<Index> neighbors(Index i, Map m)
 {
-  std::vector<int> idxs = {-1,0,1};
-  std::vector<Index> ret;
-
-  for(auto x : idxs)
-    for(auto y : idxs)
-    {
-      // Skip center and diagonals. It's a non intuitive condition,
-      // but you can check it on paper.
-      if(!(std::abs(x) ^ std::abs(y)))
-	continue;
-
-      // Conditions on the coordinates
-      bool positive_coordinates = i.first+x >= 0 && i.second+y >= 0;
-      bool bounded_x_coordinate = i.first+x < m.size();
-      bool bounded_coordinates = bounded_x_coordinate && i.second+y < m[i.first+x].size();
-
-      // Skip coordinates not in the map 
-      if(!positive_coordinates || !bounded_coordinates)
-	continue;
-
-      ret.push_back(std::make_pair(i.first+x, i.second+y));
-    }
-
-  return ret;
+  return {};
 }
 
 Path reconstruct_path(Index goal, std::map<Index, Index, index_comp> came_from);
 
-template<class Heuristic>
-std::optional<Path> pathfinding(Map<Tile> map, Index start, Index goal, Heuristic h)
+using Heuristic = int(*)(Index,Index);
+
+std::optional<Path> pathfinding(Map map, Index start, Index goal, Heuristic h)
 {
   std::set<Index> closed_set;
   
@@ -184,7 +162,7 @@ std::optional<Path> pathfinding(Map<Tile> map, Index start, Index goal, Heuristi
 	continue;
 
       // Ignore occupied tiles
-      if(map[i.first][i.second] == Tile::Occupied)
+      if(map.at(i) == Tile::Occupied)
       {
 	closed_set.insert(i);
 	continue;
