@@ -33,6 +33,24 @@ enum class Tile { Free, Occupied, Start, Goal };
 std::vector<std::vector<Tile>> read_map(const std::string& file_name);
 
 // For the purpose of pathfinding
+enum class Orientation : uint32_t
+{
+  North = 0,
+  East,
+  South,
+  West
+};
+
+enum class MoveAction : uint32_t
+{
+  Forward = 0,
+  Left = 1,
+  Right = 3
+};
+
+Orientation operator+(Orientation o, MoveAction a);
+
+
 enum class Coord {X, Y};
 
 class Index {
@@ -43,40 +61,29 @@ public:
   int coord(Coord c) const;
 };
 
+
 class Map {
   std::vector<std::vector<Tile>> map;
 
 public:
   Map(std::vector<std::vector<Tile>>);
-  Tile at(Index pos) const;
-  std::vector<Tile> row_at(int idx) const;
+  std::optional<Tile> at(Index pos) const;
+  // std::vector<Tile> row_at(int idx) const;
 };
 
 
-enum class Orientation : uint32_t
-{
-  North = 0,
-  West,
-  South,
-  East
-};
-enum class MoveAction : uint32_t
-{
-  Forward = 0,
-  Right = 1,
-  Left = 3
-};
-
-Orientation operator+(Orientation o, MoveAction a);
 
 class State {
   Index pos;
   Orientation compass;
 
 public:
+  State(Index, Orientation);
   Index get_pos() const;
-  State operator+(MoveAction a);
+  Orientation get_compass() const;
 };
+
+State operator+(State s, MoveAction a);
 
 template<class T>
 using Map = std::vector<std::vector<T>>;

@@ -26,6 +26,85 @@ std::vector<std::vector<Tile>> read_map(const std::string& file_name)
   return ret;
 }
 
+/*
+ * Index IMPLEMENTATION
+ * --------------------
+ */
+Index::Index(int x, int y) : pos{x,y} { }
+
+Index::coord(Coord c) const
+{
+  switch(c)
+  {
+    case Coord::X:
+      return pos.first;
+    case Coord::Y:
+      return pos.second;
+  }
+}
+
+
+/*
+ * Map IMPLEMENTATION
+ * ------------------
+ */
+
+Map::Map(std::vector<std::vector<Tile>> map) : map(map) { }
+
+std::optional<Tile> Map::at(Index pos) const
+{
+  using Coord;
+  bool positive_coordinates = pos.coord(X) >= 0 && pos.coord(Y) >= 0;
+  bool bounded_x_coordinate = pos.coord(X) < map.size();
+  bool bounded_coordinates = bounded_x_coordinate && pos.coord(Y) < m[pos.coord(X)].size();
+
+  if(!(positive_coordinates && bounded_coordinates))
+    return {};
+
+  return map[pos.coord(X)][pos.coord(Y)];
+}
+
+/*
+ * Orientation IMPLEMENTATION
+ * --------------------------
+ */
+
+Orientation operator+(Orientation o, MoveAction a)
+{
+  return Orientation { (static_cast<uint32_t>(o) + static_cast<uint32_t>(a)) % 4 };
+}
+
+/*
+ * State IMPLEMENTATION
+ * --------------------
+ */
+
+State::State(Index pos, Orientation compass) : pos(pos), compass(compass) { }
+
+Index State::get_pos() const
+{
+  return pos;
+}
+
+State operator+(State s, MoveAction a)
+{
+  Index pos = s.get_pos();
+
+  if(a == MoveAction::Forward)
+    pos = Index {
+      pos.coord(Coord::X)+(static_cast<uint32_t>(s.get_compass())-1)%2,
+      pos.coord(Coord::Y)+(static_cast<uint32_t>(s.get_compass())-2)%2
+    };
+
+
+  return State { pos, s.get_compass() + a };
+}
+
+/*
+ * index_comp IMPLEMENTATION
+ * --------------------------
+ */
+
 
 bool index_comp::operator()(const Index& a, const Index& b) const
   {
