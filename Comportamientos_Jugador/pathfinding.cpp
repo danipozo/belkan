@@ -48,6 +48,15 @@ bool Index::operator==(const Index& other) const
   return pos == other.pos;
 }
 
+bool Index::operator<(const Index& other) const
+{
+  if(coord(Coord::X) < other.coord(Coord::X)) return true;
+  if(coord(Coord::X) > other.coord(Coord::X)) return false;
+
+  if(coord(Coord::Y) < other.coord(Coord::Y)) return true;
+
+  return false;
+}
 
 /*
  * Map IMPLEMENTATION
@@ -95,6 +104,7 @@ Orientation State::get_compass() const
   return compass;
 }
 
+
 State operator+(State s, MoveAction a)
 {
   Index pos = s.get_pos();
@@ -110,20 +120,27 @@ State operator+(State s, MoveAction a)
 }
 
 /*
- * index_comp IMPLEMENTATION
+ * state_comp IMPLEMENTATION
  * --------------------------
  */
 
 
-bool index_comp::operator()(const Index& a, const Index& b) const
+bool state_comp::operator()(const State& a, const State& b) const
 {
-    if(a.coord(Coord::X) < b.coord(Coord::X)) return true;
-    if(a.coord(Coord::X) > b.coord(Coord::X)) return false;
+  if(a.get_pos() < b.get_pos()) return true;
+  if(b.get_pos() < a.get_pos()) return false;
 
-    if(a.coord(Coord::Y) < b.coord(Coord::Y)) return true;
+  if(static_cast<uint32_t>(a.get_compass()) < static_cast<uint32_t>(b.get_compass()))
+    return true;
 
-    return false;
+  return false;
 }
+
+/*
+ * Heuristics
+ * ----------
+ */
+
 
 int manhattan_distance(Index x, Index y)
 {
@@ -144,9 +161,13 @@ int_infty& int_infty::operator=(int other)
   }
   
 
-int comp::operator()(const Index& a, const Index& b)
+int state_comp_fscore::operator()(const State& a, const State& b) const
 {
-  return f_score.get()[a] < f_score.get()[b];
+  if(f_score.get()[a] != f_score.get()[b])
+    return f_score.get()[a] < f_score.get()[b];
+  
+  return  static_cast<uint32_t>(a.get_compass()) <
+          static_cast<uint32_t>(b.get_compass());
 }
 
 

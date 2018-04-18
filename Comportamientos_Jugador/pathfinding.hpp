@@ -62,6 +62,7 @@ public:
   Index(int x, int y);
   int coord(Coord c) const;
   bool operator==(const Index& other) const;
+  bool operator<(const Index& other) const;
 };
 
 
@@ -91,11 +92,11 @@ State operator+(State s, MoveAction a);
 // template<class T>
 // using Map = std::vector<std::vector<T>>;
 // using Index = std::pair<int, int>;
-using Path = std::list<Index>;
+using Path = std::list<MoveAction>;
 
 // Compare indices.
-struct index_comp {
-  bool operator()(const Index& a, const Index& b) const;
+struct state_comp {
+  bool operator()(const State& a, const State& b) const;
 };
 
 int manhattan_distance(Index x, Index y);
@@ -108,12 +109,12 @@ struct int_infty {
   int_infty& operator=(int other);
 };
 
-struct comp {
-  std::reference_wrapper<std::map<Index, int_infty, index_comp>> f_score;
+struct state_comp_fscore {
+  std::reference_wrapper<std::map<State, int_infty, state_comp>> f_score;
   
-  comp(std::map<Index, int_infty, index_comp>& f_score) : f_score(f_score) {}
+  state_comp_fscore(std::map<State, int_infty, state_comp>& f_score) : f_score(f_score) {}
   
-  int operator()(const Index& a, const Index& b);
+  int operator()(const State& a, const State& b) const;
 };
 
 std::vector<State> neighbors(State s, Map m)
