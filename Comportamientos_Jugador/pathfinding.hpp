@@ -82,6 +82,7 @@ class State {
   Orientation compass;
 
 public:
+  State() = default;
   State(Index, Orientation);
   Index get_pos() const;
   Orientation get_compass() const;
