@@ -57,6 +57,8 @@ class Index {
   std::pair<int,int> pos;
 
 public:
+  Index() = default;
+  Index(const Index& other) = default;
   Index(int x, int y);
   int coord(Coord c) const;
   bool operator==(const Index& other) const;
@@ -97,6 +99,7 @@ struct index_comp {
 };
 
 int manhattan_distance(Index x, Index y);
+int zero_distance(Index x, Index y);
 
 struct int_infty {
   int i = std::numeric_limits<int>::max()*(5./6); // A reasonably big number,
@@ -124,7 +127,7 @@ using Heuristic = int(*)(Index,Index);
 
 std::optional<Path> pathfinding(Map map, Index start, Index goal, Heuristic h)
 {
-  std::set<Index> closed_set;
+  std::set<Index, index_comp> closed_set;
   
   std::map<Index, Index, index_comp> came_from;
   std::map<Index, int_infty, index_comp> g_score;

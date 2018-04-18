@@ -43,6 +43,11 @@ int Index::coord(Coord c) const
   }
 }
 
+bool Index::operator==(const Index& other) const
+{
+  return pos == other.pos;
+}
+
 
 /*
  * Map IMPLEMENTATION
@@ -85,6 +90,11 @@ Index State::get_pos() const
   return pos;
 }
 
+Orientation State::get_compass() const
+{
+  return compass;
+}
+
 State operator+(State s, MoveAction a)
 {
   Index pos = s.get_pos();
@@ -119,6 +129,11 @@ int manhattan_distance(Index x, Index y)
 {
   return std::abs(x.coord(Coord::X)-y.coord(Coord::X)) +
          std::abs(x.coord(Coord::Y)-y.coord(Coord::Y));
+}
+
+int zero_distance(Index x, Index y)
+{
+  return 0;
 }
 
 int_infty::operator int&() { return i; }
