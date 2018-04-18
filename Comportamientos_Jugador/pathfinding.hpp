@@ -117,16 +117,17 @@ struct state_comp_fscore {
   int operator()(const State& a, const State& b) const;
 };
 
-std::vector<State> neighbors(State s, Map m)
+std::vector<std::pair<State,MoveAction>> neighbors(State s, Map m)
 {
-  std::vector<State> ret;
+  std::vector<std::pair<State, MoveAction>> ret;
 
   for(int i=0; i<4; i++)
   {
-    State neighbor = s + static_cast<MoveAction>(i);
+    MoveAction a = static_cast<MoveAction>(i);
+    State neighbor = s + a;
 
     if(m.at(neighbor.get_pos()) && m.at(neighbor.get_pos()) != Tile::Occupied)
-      ret.push_back(neighbor);
+      ret.push_back({neighbor, a});
   }
 
   return ret;
