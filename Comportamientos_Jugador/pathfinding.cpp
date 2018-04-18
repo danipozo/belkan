@@ -171,7 +171,25 @@ int state_comp_fscore::operator()(const State& a, const State& b) const
 }
 
 
-  Path reconstruct_path(State last_reached, std::map<State, std::pair<State,MoveAction>, state_comp> came_from)
+std::vector<std::pair<State,MoveAction>> neighbors(State s, Map m)
+{
+  std::vector<std::pair<State, MoveAction>> ret;
+
+  for(int i=0; i<4; i++)
+  {
+    MoveAction a = static_cast<MoveAction>(i);
+    State neighbor = s + a;
+
+    if(m.at(neighbor.get_pos()) && m.at(neighbor.get_pos()) != Tile::Occupied)
+      ret.push_back({neighbor, a});
+  }
+
+  return ret;
+}
+
+
+
+Path reconstruct_path(State last_reached, std::map<State, std::pair<State,MoveAction>, state_comp> came_from)
 {
   Path ret;
   State current = last_reached;
@@ -185,4 +203,62 @@ int state_comp_fscore::operator()(const State& a, const State& b) const
   }
 
   return ret;
+}
+
+std::optional<Path> pathfinding(Map map, Index start, Index goal, Heuristic h)
+{
+  std::set<State, state_comp> closed_set;
+
+  std::map<State, std::pair<State,MoveAction>, state_comp> came_from;
+  std::map<State, int_infty, state_comp> g_score;
+  g_score[State{start,Orientation::North}] = 0;
+
+  std::map<State, int_infty, state_comp> f_score;
+  f_score[State{start,Orientation::North}] = h(start, goal);
+
+  std::set<State, state_comp_fscore>
+    open_set((state_comp_fscore(f_score)));
+
+  open_set.insert(State{start,Orientation::North});
+
+  while(!open_set.empty())
+  {
+    auto current_it = open_set.begin(); 
+    auto current = *(current_it);
+
+    if(current.get_pos() == goal)
+      return std::optional<Path>(reconstruct_path(current, came_from));
+
+    open_set.erase(current_it);
+    closed_set.insert(current);
+
+    // Ignore already evaluated neighbors
+    for(auto [i,a] : neighbors(current, map))
+    {
+      if(closed_set.count(i))
+	continue;
+
+      // Ignore occupied tiles
+      if(map.at(i.get_pos()) == Tile::Occupied)
+      {
+	closed_set.insert(i);
+	continue;
+      }
+
+      if(!open_set.count(i))
+      {
+	open_set.insert(i);
+      }
+
+      auto tentative_g_score = g_score[current] + 1;
+      if(tentative_g_score >= g_score[i]) continue;
+
+      came_from[i] = {current,a};
+      g_score[i] = tentative_g_score;
+      f_score[i] = tentative_g_score + h(i.get_pos(), goal);
+    }
+
+  }
+
+  return std::nullopt;
 }
