@@ -116,9 +116,19 @@ struct comp {
   int operator()(const Index& a, const Index& b);
 };
 
-std::vector<Index> neighbors(Index i, Map m)
+std::vector<State> neighbors(State s, Map m)
 {
-  return {};
+  std::vector<State> ret;
+
+  for(int i=0; i<4; i++)
+  {
+    State neighbor = s + static_cast<MoveAction>(i);
+
+    if(m.at(neighbor.get_pos()) && m.at(neighbor.get_pos()) != Tile::Occupied)
+      ret.push_back(neighbor);
+  }
+
+  return ret;
 }
 
 Path reconstruct_path(Index goal, std::map<Index, Index, index_comp> came_from);
