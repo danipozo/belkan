@@ -171,15 +171,17 @@ int state_comp_fscore::operator()(const State& a, const State& b) const
 }
 
 
-Path reconstruct_path(Index goal, std::map<Index, Index, index_comp> came_from)
+  Path reconstruct_path(State last_reached, std::map<State, std::pair<State,MoveAction>, state_comp> came_from)
 {
-  Path ret = {goal};
-  Index current = goal;
+  Path ret;
+  State current = last_reached;
   
   while(came_from.count(current))
   {
-    current = came_from[current];
-    ret.push_front(current);
+    auto [c, a] = came_from[current];
+    current = c;
+    
+    ret.push_front(a);
   }
 
   return ret;

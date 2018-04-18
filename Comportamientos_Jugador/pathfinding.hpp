@@ -133,67 +133,61 @@ std::vector<std::pair<State,MoveAction>> neighbors(State s, Map m)
   return ret;
 }
 
-Path reconstruct_path(Index goal, std::map<Index, Index, index_comp> came_from);
+Path reconstruct_path(State last_reached, std::map<State, std::pair<State,MoveAction>, state_comp> came_from);
 
 using Heuristic = int(*)(Index,Index);
 
 std::optional<Path> pathfinding(Map map, Index start, Index goal, Heuristic h)
 {
-  std::set<Index, index_comp> closed_set;
+  std::set<State, state_comp> closed_set;
   
-  std::map<Index, Index, index_comp> came_from;
-  std::map<Index, int_infty, index_comp> g_score;
-  g_score[start] = 0;
+  std::map<State, std::pair<State,MoveAction>, state_comp> came_from;
+  std::map<State, int_infty, state_comp> g_score;
+  g_score[State{start,Orientation::North}] = 0;
 
-  std::map<Index, int_infty, index_comp> f_score;
-  f_score[start] = h(start, goal);
+  std::map<State, int_infty, state_comp> f_score;
+  f_score[State{start,Orientation::North}] = h(start, goal);
 
-  std::multiset<Index, comp>
-    open_set((comp(f_score)));
-  // REVIEW: this seems like a bad solution to me, as it forces manually
-  // inserting and removing elements from the set at every insertion
-  // and removal on the priority queue.
-  
-  // To track tiles in the open set,
-  // not allowed by the priority queue.
-  std::set<Index> open_set_;
-  open_set.insert(start);
+  std::set<State, state_comp_fscore>
+    open_set((state_comp_fscore(f_score)));
+
+  open_set.insert(State{start,Orientation::North});
 
   while(!open_set.empty())
   {
     auto current_it = open_set.begin(); 
     auto current = *(current_it);
 
-    if(current == goal)
-      return std::optional<Path>(reconstruct_path(goal, came_from));
+    if(current.get_pos() == goal)
+      return std::optional<Path>(reconstruct_path(current, came_from));
 
     open_set.erase(current_it);
     closed_set.insert(current);
 
     // Ignore already evaluated neighbors
-    for(auto i : neighbors(current, map))
+    for(auto [i,a] : neighbors(current, map))
     {
       if(closed_set.count(i))
 	continue;
 
       // Ignore occupied tiles
-      if(map.at(i) == Tile::Occupied)
+      if(map.at(i.get_pos()) == Tile::Occupied)
       {
 	closed_set.insert(i);
 	continue;
       }
 
-      if(!open_set_.count(i))
+      if(!open_set.count(i))
       {
 	open_set.insert(i);
       }
 
-      auto tentative_g_score = g_score[current] + manhattan_distance(current, i);
+      auto tentative_g_score = g_score[current] + 1;
       if(tentative_g_score >= g_score[i]) continue;
 
-      came_from[i] = current;
+      came_from[i] = {current,a};
       g_score[i] = tentative_g_score;
-      f_score[i] = tentative_g_score + h(i, goal);
+      f_score[i] = tentative_g_score + h(i.get_pos(), goal);
     }
     
   }
