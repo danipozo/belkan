@@ -63,6 +63,16 @@ bool ComportamientoJugador::pathFinding(const estado &origen, const estado &dest
   return false;
 }
 
+Action to_action(MoveAction a)
+{
+  switch(a)
+  {
+    case MoveAction::Forward: return actFORWARD;
+    case MoveAction::Left: return actTURN_L;
+    case MoveAction::Right: return actTURN_R;
+  }
+}
+
 Action ComportamientoJugador::think(Sensores sensores) {
   return actFORWARD;
 }
