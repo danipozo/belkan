@@ -5,6 +5,8 @@
 
 #include <list>
 
+#include "pathfinding.hpp"
+
 struct estado {
   int fila;
   int columna;
@@ -34,6 +36,7 @@ class ComportamientoJugador : public Comportamiento {
 
     Action think(Sensores sensores);
     int interact(Action accion, int valor);
+    void VisualizaPlan(const estado &st, const list<Action> &plan);
     ComportamientoJugador * clone(){return new ComportamientoJugador(*this);}
 
   private:
