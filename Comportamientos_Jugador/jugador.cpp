@@ -110,10 +110,15 @@ Orientation to_orientation(int compass)
 }
 
 Action ComportamientoJugador::think(Sensores sensores) {
+  if(first_iteration)
+  {
+    pos = State { Index { sensores.mensajeF, sensores.mensajeC }, Orientation::North };
+    first_iteration = false;
+  }
+
   if(goal.get_pos() != Index { sensores.destinoF, sensores.destinoC })
   {
     goal = State { Index { sensores.destinoF, sensores.destinoC}, Orientation::North};
-    pos = State { Index { sensores.mensajeF, sensores.mensajeC }, Orientation::North };
 
     std::vector<std::vector<Tile>> map_v(mapaResultado.size());
     std::transform(mapaResultado.begin(), mapaResultado.end(), map_v.begin(),
@@ -127,24 +132,35 @@ Action ComportamientoJugador::think(Sensores sensores) {
     Map map(map_v);
 
     plan.clear();
-    auto path_ = pathfinding(map, pos.get_pos(), goal.get_pos(), zero_distance);
 
+    auto path_ = pathfinding(map, pos, goal.get_pos(), zero_distance);
     if(!path_)
     {
-      std::cout << "Error: no se ha encontrado una ruta al objetivo" << std::endl;
+      std::cout << "Error: couldn't find path to target" << std::endl;
       return actFORWARD;
     }
 
     auto path = path_.value();
-
-    std::transform(path.begin(), path.end(), plan.begin(), to_action);
+    std::transform(path.begin(), path.end(), std::back_inserter(plan), to_action);
 
     VisualizaPlan(from_state(pos), plan);
   }
 
 
+  Action action;
+  if(!plan.empty())
+  {
+    action = plan.front();
+    pos = pos + from_action(action);
+    plan.pop_front();
+  }
+  else
+  {
+    std::cout << "Empty plan" << std::endl;
+    return actIDLE;
+  }
 
-  return actFORWARD;
+  return action;
 }
 
 int ComportamientoJugador::interact(Action accion, int valor){

@@ -5,6 +5,7 @@
 
 #include <list>
 #include <algorithm>
+#include <iterator>
 
 #include "pathfinding.hpp"
 
@@ -46,6 +47,7 @@ class ComportamientoJugador : public Comportamiento {
     estado destino;
     State goal;
     State pos;
+    bool first_iteration = true;
     list<Action> plan;
 
     bool pathFinding(const estado &origen, const estado &destino, list<Action> &plan);
