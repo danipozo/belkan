@@ -12,6 +12,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 #include <functional>
 #include <limits>
@@ -89,6 +90,11 @@ public:
   Index get_pos() const;
   Orientation get_compass() const;
 };
+
+std::string print_index(Index i);
+std::string print_compass(Orientation o);
+std::string print_state(State st);
+std::string print_action(MoveAction a);
 
 State operator+(State s, MoveAction a);
 

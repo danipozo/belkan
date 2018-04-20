@@ -176,6 +176,54 @@ int state_comp_fscore::operator()(const State& a, const State& b) const
           static_cast<uint32_t>(b.get_compass());
 }
 
+std::string print_index(Index i)
+{
+  std::ostringstream os;
+  os << "(" << i.coord(Coord::X) << "," << i.coord(Coord::Y) << ")";
+
+  return os.str();
+}
+
+std::string print_compass(Orientation o)
+{
+  std::ostringstream os;
+  std::string names[] = { "North", "West", "South", "East" };
+
+  os << names[static_cast<uint32_t>(o)];
+
+  return os.str();
+}
+
+std::string print_state(State st)
+{
+  std::ostringstream os;
+  os << "State{ " << print_index(st.get_pos()) << ", "
+     << print_compass(st.get_compass()) << " }";
+
+  return os.str();
+}
+
+std::string print_action(MoveAction a)
+{
+  std::ostringstream os;
+  std::string names[] = { "Forward", "Left", "", "Right" };
+
+  os << names[static_cast<uint32_t>(a)];
+
+  return os.str();
+}
+
+std::string print_tile(Tile t)
+{
+  switch(t)
+  {
+  case Tile::Free: return "Free";
+  case Tile::Occupied: return "Occupied";
+  case Tile::Goal: return "Goal";
+  case Tile::Start: return "Start";
+  }
+}
+
 
 std::vector<std::pair<State,MoveAction>> neighbors(State s, Map m)
 {
