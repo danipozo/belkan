@@ -63,6 +63,11 @@ bool ComportamientoJugador::pathFinding(const estado &origen, const estado &dest
   return false;
 }
 
+estado from_state(State st)
+{
+  return estado { st.get_pos().coord(Coord::X), st.get_pos().coord(Coord::Y), static_cast<int>(st.get_compass()) };
+}
+
 Action to_action(MoveAction a)
 {
   switch(a)
@@ -71,6 +76,19 @@ Action to_action(MoveAction a)
     case MoveAction::Left: return actTURN_L;
     case MoveAction::Right: return actTURN_R;
   }
+}
+
+Tile to_tile(unsigned char c)
+{
+  unsigned char free[] = {'t', 's', 'k'};
+
+  return std::any_of(free, free+sizeof(free), [c](auto a){ return a == c; })
+       ? Tile::Free : Tile::Occupied;
+}
+
+Orientation to_orientation(int compass)
+{
+  return Orientation{ static_cast<uint32_t>(compass) };
 }
 
 Action ComportamientoJugador::think(Sensores sensores) {
