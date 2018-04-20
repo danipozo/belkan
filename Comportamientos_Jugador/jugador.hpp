@@ -4,6 +4,7 @@
 #include "comportamientos/comportamiento.hpp"
 
 #include <list>
+#include <algorithm>
 
 #include "pathfinding.hpp"
 
@@ -43,6 +44,8 @@ class ComportamientoJugador : public Comportamiento {
     // Declarar Variables de Estado
     int fil, col, brujula;
     estado destino;
+    State goal;
+    State pos;
     list<Action> plan;
 
     bool pathFinding(const estado &origen, const estado &destino, list<Action> &plan);

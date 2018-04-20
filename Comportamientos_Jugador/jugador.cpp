@@ -92,6 +92,40 @@ Orientation to_orientation(int compass)
 }
 
 Action ComportamientoJugador::think(Sensores sensores) {
+  if(goal.get_pos() != Index { sensores.destinoF, sensores.destinoC })
+  {
+    goal = State { Index { sensores.destinoF, sensores.destinoC}, Orientation::North};
+    pos = State { Index { sensores.mensajeF, sensores.mensajeC }, Orientation::North };
+
+    std::vector<std::vector<Tile>> map_v(mapaResultado.size());
+    std::transform(mapaResultado.begin(), mapaResultado.end(), map_v.begin(),
+		   [](auto row){
+		     std::vector<Tile> map_row(row.size());
+		     std::transform(row.begin(), row.end(), map_row.begin(), to_tile);
+
+		     return map_row;
+		   });
+
+    Map map(map_v);
+
+    plan.clear();
+    auto path_ = pathfinding(map, pos.get_pos(), goal.get_pos(), zero_distance);
+
+    if(!path_)
+    {
+      std::cout << "Error: no se ha encontrado una ruta al objetivo" << std::endl;
+      return actFORWARD;
+    }
+
+    auto path = path_.value();
+
+    std::transform(path.begin(), path.end(), plan.begin(), to_action);
+
+    VisualizaPlan(from_state(pos), plan);
+  }
+
+
+
   return actFORWARD;
 }
 
