@@ -229,7 +229,7 @@ std::vector<std::pair<State,MoveAction>> neighbors(State s, Map m)
 {
   std::vector<std::pair<State, MoveAction>> ret;
 
-  for(int i=0; i<4; i++)
+  for(uint32_t i : {0,1,3})
   {
     MoveAction a = static_cast<MoveAction>(i);
     State neighbor = s + a;
