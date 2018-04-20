@@ -63,9 +63,16 @@ bool ComportamientoJugador::pathFinding(const estado &origen, const estado &dest
   return false;
 }
 
+int to_regular_compass(Orientation o)
+{
+  int lookup[] = {0, 3, 2, 1};
+
+  return lookup[static_cast<uint32_t>(o)];
+}
+
 estado from_state(State st)
 {
-  return estado { st.get_pos().coord(Coord::X), st.get_pos().coord(Coord::Y), static_cast<int>(st.get_compass()) };
+  return estado { st.get_pos().coord(Coord::X), st.get_pos().coord(Coord::Y), to_regular_compass(st.get_compass()) };
 }
 
 Action to_action(MoveAction a)
@@ -78,9 +85,19 @@ Action to_action(MoveAction a)
   }
 }
 
+MoveAction from_action(Action a)
+{
+  switch(a)
+  {
+    case actFORWARD: return MoveAction::Forward;
+    case actTURN_L: return MoveAction::Left;
+    case actTURN_R: return MoveAction::Right;
+  }
+}
+
 Tile to_tile(unsigned char c)
 {
-  unsigned char free[] = {'t', 's', 'k'};
+  unsigned char free[] = {'T', 'S', 'K'};
 
   return std::any_of(free, free+sizeof(free), [c](auto a){ return a == c; })
        ? Tile::Free : Tile::Occupied;
@@ -88,7 +105,8 @@ Tile to_tile(unsigned char c)
 
 Orientation to_orientation(int compass)
 {
-  return Orientation{ static_cast<uint32_t>(compass) };
+  int lookup[] = {0, 3, 2, 1};
+  return Orientation{ static_cast<uint32_t>(lookup[compass]) };
 }
 
 Action ComportamientoJugador::think(Sensores sensores) {

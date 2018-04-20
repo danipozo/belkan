@@ -36,9 +36,9 @@ std::vector<std::vector<Tile>> read_map(const std::string& file_name);
 enum class Orientation : uint32_t
 {
   North = 0,
-  East,
+  West,
   South,
-  West
+  East
 };
 
 enum class MoveAction : uint32_t
