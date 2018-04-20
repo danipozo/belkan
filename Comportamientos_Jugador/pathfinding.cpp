@@ -194,7 +194,6 @@ std::vector<std::pair<State,MoveAction>> neighbors(State s, Map m)
 }
 
 
-
 Path reconstruct_path(State last_reached, std::map<State, std::pair<State,MoveAction>, state_comp> came_from)
 {
   Path ret;
@@ -211,21 +210,21 @@ Path reconstruct_path(State last_reached, std::map<State, std::pair<State,MoveAc
   return ret;
 }
 
-std::optional<Path> pathfinding(Map map, Index start, Index goal, Heuristic h)
+std::optional<Path> pathfinding(Map map, State start, Index goal, Heuristic h)
 {
   std::set<State, state_comp> closed_set;
 
   std::map<State, std::pair<State,MoveAction>, state_comp> came_from;
   std::map<State, int_infty, state_comp> g_score;
-  g_score[State{start,Orientation::North}] = 0;
+  g_score[start] = 0;
 
   std::map<State, int_infty, state_comp> f_score;
-  f_score[State{start,Orientation::North}] = h(start, goal);
+  f_score[start] = h(start.get_pos(), goal);
 
   std::set<State, state_comp_fscore>
     open_set((state_comp_fscore(f_score)));
 
-  open_set.insert(State{start,Orientation::North});
+  open_set.insert(start);
 
   while(!open_set.empty())
   {
@@ -238,9 +237,10 @@ std::optional<Path> pathfinding(Map map, Index start, Index goal, Heuristic h)
     open_set.erase(current_it);
     closed_set.insert(current);
 
-    // Ignore already evaluated neighbors
+
     for(auto [i,a] : neighbors(current, map))
     {
+      // Ignore already evaluated neighbors
       if(closed_set.count(i))
 	continue;
 

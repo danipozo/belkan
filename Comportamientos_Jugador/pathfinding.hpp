@@ -126,7 +126,7 @@ Path reconstruct_path(State last_reached, std::map<State, std::pair<State,MoveAc
 
 using Heuristic = int(*)(Index,Index);
 
-std::optional<Path> pathfinding(Map map, Index start, Index goal, Heuristic h);
+std::optional<Path> pathfinding(Map map, State start, Index goal, Heuristic h);
 
 
 #endif // __PATHFINDING_HPP__
