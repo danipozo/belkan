@@ -62,6 +62,7 @@ public:
   Index(int x, int y);
   int coord(Coord c) const;
   bool operator==(const Index& other) const;
+  bool operator!=(const Index& other) const;
   bool operator<(const Index& other) const;
 };
 
@@ -70,6 +71,7 @@ class Map {
   std::vector<std::vector<Tile>> map;
 
 public:
+  Map(std::vector<std::vector<Tile>>&&);
   Map(std::vector<std::vector<Tile>>);
   std::optional<Tile> at(Index pos) const;
   // std::vector<Tile> row_at(int idx) const;

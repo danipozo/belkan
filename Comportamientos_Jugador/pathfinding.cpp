@@ -48,6 +48,11 @@ bool Index::operator==(const Index& other) const
   return pos == other.pos;
 }
 
+bool Index::operator!=(const Index& other) const
+{
+  return !(*this == other);
+}
+
 bool Index::operator<(const Index& other) const
 {
   if(coord(Coord::X) < other.coord(Coord::X)) return true;
@@ -63,6 +68,7 @@ bool Index::operator<(const Index& other) const
  * ------------------
  */
 
+Map::Map(std::vector<std::vector<Tile>>&& map) : map(map) { }
 Map::Map(std::vector<std::vector<Tile>> map) : map(map) { }
 
 std::optional<Tile> Map::at(Index pos) const
