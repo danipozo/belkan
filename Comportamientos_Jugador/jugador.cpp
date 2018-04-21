@@ -109,11 +109,16 @@ Orientation to_orientation(int compass)
   return Orientation{ static_cast<uint32_t>(lookup[compass]) };
 }
 
+std::ofstream path_log;
+const std::string map_name = "map100";
+
 Action ComportamientoJugador::think(Sensores sensores) {
   if(first_iteration)
   {
     pos = State { Index { sensores.mensajeF, sensores.mensajeC }, Orientation::North };
     first_iteration = false;
+
+    path_log.open("data/"+map_name, std::ios::out | std::ios::ate);
   }
 
   if(goal.get_pos() != Index { sensores.destinoF, sensores.destinoC })
@@ -139,6 +144,8 @@ Action ComportamientoJugador::think(Sensores sensores) {
       std::cout << "Error: couldn't find path to target" << std::endl;
       return actFORWARD;
     }
+
+    path_log << map_name << " " << print_index(pos.get_pos()) << " " << print_index(goal.get_pos()) << " " << path_.value().size() << std::endl;
 
     auto path = path_.value();
     std::transform(path.begin(), path.end(), std::back_inserter(plan), to_action);
